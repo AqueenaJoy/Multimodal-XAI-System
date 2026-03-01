@@ -1,0 +1,13 @@
+__pycache__/
+venv/
+models/
+uploads/
+*.pyc
+test_fnn
+train_fnn
+test_text_model
+aeroplane.jpg
+cat.jpg
+tempCodeRunnerFile
+test_image_text
+build_fakenewsnet_excel
