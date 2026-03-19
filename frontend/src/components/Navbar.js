@@ -17,7 +17,7 @@ function Navbar() {
 
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
-      <div className="logo">Explainable Multimodal AI</div>
+      <div className="logo">Media Integrity XAI</div>
       <div className="nav-links">
         <button onClick={() => scrollTo("home")}>Home</button>
         <button onClick={() => scrollTo("guide")}>Guide</button>

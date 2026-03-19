@@ -3,22 +3,41 @@ import os
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from emotion_module import detect_emotion
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "models", "text_model_fnn")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Load once
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, local_files_only=True)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH, local_files_only=True)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-model.to(device)
-model.eval()
+# ================================
+# LOAD FNN STYLE MODEL
+# ================================
+# Reverting to the local custom-trained model as community HF models are severely overfitted
+FNN_PATH = os.path.join(BASE_DIR, "models", "text_model_fnn")
+
+fnn_tokenizer = AutoTokenizer.from_pretrained(FNN_PATH)
+fnn_model = AutoModelForSequenceClassification.from_pretrained(FNN_PATH)
+
+fnn_model.to(device)
+fnn_model.eval()
+
+# ================================
+# LOAD LIAR CLAIM MODEL
+# ================================
+LIAR_PATH = os.path.join(BASE_DIR, "models", "liar_binary_model")
+
+liar_tokenizer = AutoTokenizer.from_pretrained(LIAR_PATH)
+liar_model = AutoModelForSequenceClassification.from_pretrained(LIAR_PATH)
+
+liar_model.to(device)
+liar_model.eval()
 
 
-def predict_text_module(text):
+# ================================
+# STYLE PREDICTION (FNN)
+# ================================
+def predict_style(text):
 
-    inputs = tokenizer(
+    inputs = fnn_tokenizer(
         text,
         truncation=True,
         padding=True,
@@ -27,20 +46,56 @@ def predict_text_module(text):
     ).to(device)
 
     with torch.no_grad():
-        outputs = model(**inputs)
+        outputs = fnn_model(**inputs)
         probs = torch.softmax(outputs.logits, dim=1)
-        model_fake_prob = probs[0][1].item()
 
-    # -------- Short Text Stabilization --------
-    if len(text.split()) <= 7:
-        fake_prob = 0.5
-    else:
-        fake_prob = model_fake_prob
+    fake_prob = probs[0][1].item()
+    return fake_prob
 
+
+# ================================
+# CLAIM PREDICTION (LIAR)
+# ================================
+def predict_claim(text):
+
+    inputs = liar_tokenizer(
+        text,
+        truncation=True,
+        padding=True,
+        max_length=128,
+        return_tensors="pt"
+    ).to(device)
+
+    with torch.no_grad():
+        outputs = liar_model(**inputs)
+        probs = torch.softmax(outputs.logits, dim=1)
+
+    fake_prob = probs[0][0].item()
+    return fake_prob
+
+
+# ================================
+# COMBINED TEXT MODULE
+# ================================
+def predict_text_module(text):
+
+    # Style-based fake probability
+    style_fake = predict_style(text)
+
+    # Claim-based fake probability
+    claim_fake = predict_claim(text)
+
+    # Weighted combination (60% claim, 40% style)
+    combined_fake = (0.4 * style_fake) + (0.6 * claim_fake)
+
+    # Emotion detection
     emotion_data = detect_emotion(text)
 
     return {
-        "fake_probability": round(fake_prob, 4),
+        "style_fake_probability": round(style_fake, 4),
+        "claim_fake_probability": round(claim_fake, 4),
+        "fake_probability": round(combined_fake, 4),  # For fusion compatibility
         "emotion": emotion_data["emotion"],
-        "emotion_score": round(emotion_data["emotion_score"], 4)
+        "emotion_score": round(emotion_data["emotion_score"], 4),
+        "top_emotions": emotion_data.get("top_emotions", [])
     }

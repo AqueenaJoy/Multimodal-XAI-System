@@ -1,0 +1,35 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Model files
+backend/models/
+backend/__pycache__/
+
+# Uploads
+uploads/
+backend/uploads/
+
+# Temp files
+*tempCodeRunnerFile.py
+
+# CSV training data (optional)
+backend/train_*.csv
+backend/test_*.csv
+
+# React
+frontend/node_modules/
+frontend/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+venv/
+frontend/node_modules/
+__pycache__/
+*.pyc
+uploads/

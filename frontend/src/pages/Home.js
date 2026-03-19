@@ -3,14 +3,14 @@ function Home() {
     <section className="section hero hero-clean">
       <div className="hero-content">
         <h1>
-          Explainable Multimodal <br />
-          Misinformation & Deepfake Detection
+          
+Explainable Digital Media Integrity Risk Assessment System
         </h1>
 
         <p className="hero-subtitle">
-          A research-driven AI system combining Text Emotion Analysis,
-        Image-Text Consistency, and Face-Based Deepfake Detection
-        with Explainable AI outputs.
+          A multimodal verification engine combining 
+          Textual Emotion Analytics and Visual-Semantic 
+          Consistency with transparent XAI heatmaps and importance scoring.
         </p>
       </div>
     </section>

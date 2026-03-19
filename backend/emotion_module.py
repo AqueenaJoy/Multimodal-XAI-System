@@ -33,9 +33,14 @@ def detect_emotion(text):
     # Convert to list of {label, score}
     emotion_scores = []
     for i, score in enumerate(probs):
+        val = score.item()
+        # Penalize explicitly "neutral" so underlying hidden emotions rise up
+        #if labels[i] == "neutral":
+            #val = val * 0.3  # drop neutral score by 70%
+        
         emotion_scores.append({
             "label": labels[i],
-            "score": score.item()
+            "score": val
         })
 
     # Sort descending
@@ -45,19 +50,22 @@ def detect_emotion(text):
         reverse=True
     )
 
-    top_emotions = sorted_scores[:3]
+    top_emotions = sorted_scores[1:4]
+
+    top_emotion = top_emotions[0]
+    final_label = top_emotion["label"]
 
     return {
-        "emotion": top_emotions[0]["label"],
-        "emotion_score": round(top_emotions[0]["score"], 4),
+        "emotion": final_label,
+        "emotion_score": round(top_emotion["score"], 4),
         "top_emotions": [
-            {
-                "label": emo["label"],
-                "score": round(emo["score"], 4)
-            }
-            for emo in top_emotions
-        ]
-    }
+         {
+            "label": emo["label"],
+            "score": round(emo["score"], 4)
+         }
+         for emo in top_emotions
+    ]
+}
 
 
 # Test
