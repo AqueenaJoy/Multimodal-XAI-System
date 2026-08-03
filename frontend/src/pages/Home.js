@@ -3,8 +3,8 @@ function Home() {
     <section className="section hero hero-clean">
       <div className="hero-content">
         <h1>
-          
-Explainable Digital Media Integrity Risk Assessment System
+          <span className="gradient-text">Explainable Digital Media</span><br/>
+          Integrity Risk Assessment System
         </h1>
 
         <p className="hero-subtitle">

@@ -1,49 +1,63 @@
-def multimodal_fusion(text=None, image=None):
+def multimodal_fusion(text=None, image=None, deepfake=None):
     """
-    Perform dynamic late-fusion across available modalities.
-    Each modality must provide fake probability (0–1).
+    Intelligent dynamic fusion across text, image, and deepfake modules.
     """
-
-   
-    # STANDARD FUSION LOGIC
-  
-    # Default weights
-    weights = {
-        "text": 0.8,
-        "image": 0.2
-    }
 
     scores = {}
+    weights = {}
 
-    # Collect fake probabilities
+    # ================================
+    # TEXT MODULE
+    # ================================
     if text:
-        scores["text"] = text["fake_probability"]
+        c_text = text["fake_probability"]
+        confidence = text.get("confidence", 0.5)
 
-    if image:
-        scores["image"] = image["mismatch_probability"]
+        # Dynamic weight: 0.5 → 0.8
+        text_weight = 0.5 + (0.3 * confidence)
 
+        scores["text"] = c_text
+        weights["text"] = text_weight
+
+  
+    # ================================
+    # DEEPFAKE MODULE
+    # ================================
+    if deepfake:
+        scores["deepfake"] = deepfake["fake_probability"]
+        weights["deepfake"] = 0.1
+
+    # ================================
+    # NORMALIZE WEIGHTS
+    # ================================
     if not scores:
         return None
 
-    # Normalize weights based on active modalities
-    active_weight_sum = sum(weights[k] for k in scores.keys())
+    total_weight = sum(weights.values())
 
     fusion_score = 0
     for key in scores:
-        normalized_weight = weights[key] / active_weight_sum
+        normalized_weight = weights[key] / total_weight
         fusion_score += normalized_weight * scores[key]
 
-    if fusion_score >= 0.70:
-        label = "High Fake News Risk"
-    elif fusion_score >= 0.50:
-        label = "Moderate Fake News Risk"
-    elif fusion_score >= 0.30:
-        label = "Moderately Authentic"
+    # ================================
+    # FINAL LABEL
+    # ================================
+    if fusion_score >= 0.75:
+        label = "High Fake Content Risk"
+    elif fusion_score >= 0.55:
+        label = "Moderate Fake Content Risk"
+    elif fusion_score >= 0.35:
+        label = "Moderately Authentic Content"
     else:
-        label = "Highly Authentic News"
+        label = "Highly Authentic Content"
 
+    # ================================
+    # RETURN OUTPUT
+    # ================================
     return {
         "score": round(fusion_score, 4),
         "label": label,
-        "modalities_used": list(scores.keys())
+        "modalities_used": list(scores.keys()),
+        "weights": {k: round(v / total_weight, 3) for k, v in weights.items()}
     }

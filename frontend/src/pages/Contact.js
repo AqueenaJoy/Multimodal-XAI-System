@@ -27,17 +27,17 @@ function Contact() {
   };
 
   return (
-    <section className="section contact">
-      <h2>Contact</h2>
-      <p>Feel free to reach out for collaboration or research discussion.</p>
+    <section className="section contact fade-in-up">
+      <h2><span className="gradient-text">Contact</span></h2>
+      <p className="hero-subtitle">Feel free to reach out for collaboration or research discussion.</p>
 
-      <div className="contact-card">
+      <div className="contact-card fade-in-up" style={{ animationDelay: "0.1s" }}>
         <p><strong>Name:</strong> Aqueena Joy</p>
         <p><strong>Email:</strong> joyaqueena@email.com</p>
         <p><strong>Phone:</strong> +91 1234567890</p>
       </div>
 
-      <div className="contact-form">
+      <div className="contact-form fade-in-up" style={{ animationDelay: "0.2s" }}>
         <h3>Send a Message</h3>
 
         <form onSubmit={handleSubmit}>

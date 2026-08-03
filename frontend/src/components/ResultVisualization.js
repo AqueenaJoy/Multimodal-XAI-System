@@ -1,6 +1,6 @@
 import React from "react";
 
-function ProgressBar({ value, max = 100, color = "#3b82f6" }) {
+function ProgressBar({ value, max = 100, color = "#f59e0b" }) {
   const percentage = Math.min((value / max) * 100, 100);
   return (
     <div className="progress-bar">
@@ -15,7 +15,7 @@ function ProgressBar({ value, max = 100, color = "#3b82f6" }) {
   );
 }
 
-function ConfidenceMeter({ value, max = 100, color = "#3b82f6" }) {
+function ConfidenceMeter({ value, max = 100, color = "#f59e0b" }) {
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (value / max) * circumference;
@@ -109,15 +109,15 @@ function ResultVisualization({ result }) {
 
       {/* ================= 2. FUSION RESULTS (ALWAYS SHOWN) ================= */}
       {result.fusion && (
-        <div className="card fade-in-up" style={{ background: "linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))", border: "1px solid rgba(59,130,246,0.3)" }}>
-          <h3 style={{ textAlign: "center", marginBottom: "1rem" }}>🧠 Multimodal Fusion Result</h3>
+        <div className="card fade-in-up" style={{ background: "linear-gradient(135deg, rgba(245,158,11,0.05), rgba(212,175,55,0.05))", border: "1px solid rgba(245,158,11,0.2)" }}>
+          <h3 style={{ textAlign: "center", marginBottom: "1rem" }}> Analysis Result</h3>
           <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
             <div className={`badge ${getBadgeClass(result.fusion.label)}`} style={{ fontSize: "1.2rem", padding: "0.5rem 1rem" }}>
               {result.fusion.label}
             </div>
           </div>
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "3rem", fontWeight: "bold", color: "#3b82f6" }}>{(result.fusion.score * 100).toFixed(1)}%</div>
+            <div style={{ fontSize: "3rem", fontWeight: "bold", color: "#f59e0b" }}>{(result.fusion.score * 100).toFixed(1)}%</div>
             <div style={{ color: "#94a3b8", fontSize: "0.9rem" }}>Overall Suspicion Score</div>
           </div>
         </div>
@@ -126,40 +126,12 @@ function ResultVisualization({ result }) {
       {/* ================= 3. TEXT ANALYSIS (ALWAYS SHOWN) ================= */}
       {result.text && (
         <div className="card fade-in-up">
-          <h3>📝 Text Analysis</h3>
-          <div style={{ marginBottom: "1.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-              <span>Combined Fake Probability</span>
-              <span>{(result.text.fake_probability * 100).toFixed(1)}%</span>
-            </div>
-            <ProgressBar
-              value={result.text.fake_probability * 100}
-              color={getProgressColor(result.text.fake_probability * 100)}
-            />
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
-            <div>
-              <div style={{ fontSize: "0.875rem", color: "#94a3b8", marginBottom: "0.5rem" }}>Style Risk (FNN)</div>
-              <ConfidenceMeter 
-                value={(result.text.style_fake_probability || 0) * 100} 
-                color={getProgressColor((result.text.style_fake_probability || 0) * 100)} 
-              />
-            </div>
-            <div>
-              <div style={{ fontSize: "0.875rem", color: "#94a3b8", marginBottom: "0.5rem" }}>Claim Risk (LIAR)</div>
-              <ConfidenceMeter 
-                value={(result.text.claim_fake_probability || 0) * 100} 
-                color={getProgressColor((result.text.claim_fake_probability || 0) * 100)} 
-              />
-            </div>
-          </div>
-
+          <h3>Top Detected Emotions</h3>
           <div style={{ marginTop: "1rem" }}>
-            <div style={{ fontSize: "0.875rem", color: "#94a3b8", marginBottom: "1rem" }}>Top Detected Emotions</div>
+            <div style={{ fontSize: "0.875rem", color: "#94a3b8", marginBottom: "1rem" }}></div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
               {(result.text.top_emotions || []).map((emo, index) => (
-                <div key={index} className="badge" style={{ padding: "0.5rem 1rem", background: "rgba(59, 130, 246, 0.1)", border: "1px solid #3b82f6", color: "#fff", borderRadius: "20px" }}>
+                <div key={index} className="badge" style={{ padding: "0.5rem 1rem", background: "rgba(245, 158, 11, 0.1)", border: "1px solid #f59e0b", color: "#fff", borderRadius: "20px" }}>
                   {emo.label} 
                 </div>
               ))}
@@ -196,11 +168,11 @@ function ResultVisualization({ result }) {
       <div style={{ 
         marginTop: "1rem", 
         padding: "0.75rem", 
-        background: "rgba(59, 130, 246, 0.1)", 
+        background: "rgba(245, 158, 11, 0.1)", 
         borderRadius: "8px",
-        border: "1px dashed #3b82f6" 
+        border: "1px dashed #f59e0b" 
       }}>
-        <div style={{ fontSize: "0.75rem", color: "#3b82f6", fontWeight: "bold" }}>OCR DETECTED TEXT:</div>
+        <div style={{ fontSize: "0.75rem", color: "#f59e0b", fontWeight: "bold" }}>OCR DETECTED TEXT:</div>
         <div style={{ fontSize: "0.85rem", color: "#cbd5e1" }}>"{result.explanation.ocr_text}"</div>
       </div>
     )}
@@ -210,7 +182,7 @@ function ResultVisualization({ result }) {
       {/* ================= 4. DEEPFAKE ANALYSIS ================= */}
       {result.deepfake_analysis && (
         <div className="card fade-in-up" style={{ border: "1px solid rgba(239, 68, 68, 0.3)" }}>
-          <h3>🎭 Deepfake Analysis</h3>
+          <h3>Deepfake Analysis</h3>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
             <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>{(result.deepfake_analysis.fake_probability * 100).toFixed(1)}% AI Prob.</div>
             <div className={`badge ${getBadgeClass(result.deepfake_analysis.is_deepfake ? 'fake' : 'authentic')}`}>

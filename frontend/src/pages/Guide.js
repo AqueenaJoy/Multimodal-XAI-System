@@ -3,15 +3,15 @@ import React from 'react';
 function Guide() {
   return (
     <section className="section">
-      <div className="guide-header" style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <h2>How Our System Analyzes Your Media</h2>
-        <p>The system adapts its analysis based on the files you provide.</p>
+      <div className="guide-header fade-in-up" style={{ textAlign: 'center', marginBottom: '40px' }}>
+        <h2><span className="gradient-text">How Our System</span> Analyzes Your Media</h2>
+        <p className="hero-subtitle">The system adapts its analysis based on the files you provide.</p>
       </div>
 
       <div className="guide-grid">
         {/* Step 1: Input Flexibility */}
-        <div className="card">
-          <div className="icon-box" style={{ fontSize: '2rem' }}></div>
+        <div className="card fade-in-up" style={{ animationDelay: "0.1s" }}>
+          <div className="icon-box" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}></div>
           <h3>1. Flexible Input</h3>
           <p>You can provide:</p>
           <ul style={{ textAlign: 'left', fontSize: '0.9rem' }}>
@@ -22,8 +22,8 @@ function Guide() {
         </div>
 
         {/* Step 2: The Process */}
-        <div className="card">
-          <div className="icon-box" style={{ fontSize: '2rem' }}></div>
+        <div className="card fade-in-up" style={{ animationDelay: "0.2s" }}>
+          <div className="icon-box" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}></div>
           <h3>2. Deep Analysis</h3>
           <p>Once you click <strong>Analyse</strong>, the AI runs:</p>
           <ul style={{ textAlign: 'left', fontSize: '0.9rem' }}>
@@ -34,8 +34,8 @@ function Guide() {
         </div>
 
         {/* Step 3: The Report */}
-        <div className="card">
-          <div className="icon-box" style={{ fontSize: '2rem' }}></div>
+        <div className="card fade-in-up" style={{ animationDelay: "0.3s" }}>
+          <div className="icon-box" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}></div>
           <h3>3. Analysis Report</h3>
           <p>
             The system generates a final score. A <strong>High Risk</strong> verdict means 
@@ -44,8 +44,8 @@ function Guide() {
         </div>
 
         {/* Step 4: Explainability */}
-        <div className="card">
-          <div className="icon-box" style={{ fontSize: '2rem' }}></div>
+        <div className="card fade-in-up" style={{ animationDelay: "0.4s" }}>
+          <div className="icon-box" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}></div>
           <h3>4. Interactive Evidence</h3>
           <p>
             Click <strong>Explain</strong> to see the "Why":

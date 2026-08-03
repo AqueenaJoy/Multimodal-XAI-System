@@ -1,10 +1,11 @@
 import torch
 import shap
+import numpy as np
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "text_model_fnn")
+MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "text_model_isot")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -24,19 +25,25 @@ def predict_proba(texts):
     # Force everything to string
     texts = [str(t) for t in texts]
 
-    inputs = tokenizer(
-        texts,
-        padding=True,
-        truncation=True,
-        max_length=128,
-        return_tensors="pt"
-    ).to(device)
+    batch_size = 16
+    all_probs = []
 
-    with torch.no_grad():
-        outputs = model(**inputs)
-        probs = torch.softmax(outputs.logits, dim=1)
+    for i in range(0, len(texts), batch_size):
+        batch_texts = texts[i:i + batch_size]
+        inputs = tokenizer(
+            batch_texts,
+            padding=True,
+            truncation=True,
+            max_length=128,
+            return_tensors="pt"
+        ).to(device)
 
-    return probs.cpu().numpy()
+        with torch.no_grad():
+            outputs = model(**inputs)
+            probs = torch.softmax(outputs.logits, dim=1)
+            all_probs.append(probs.cpu().numpy())
+
+    return np.vstack(all_probs)
 
 
 masker = None
@@ -60,13 +67,19 @@ def explain_text(text):
     tokens = shap_values.data[0]
     values = shap_values.values[0][:, 1]
 
+    # Normalize values by max absolute value to ensure frontend visibility
+    max_val = np.max(np.abs(values))
+    if max_val > 0:
+        values = values / max_val
+
     explanation = []
 
     for token, value in zip(tokens, values):
-        if token not in ["[CLS]", "[SEP]"]:
-            explanation.append({
-                "token": token,
-                "importance": float(value)
-            })
+        if token.strip() and token not in ["[CLS]", "[SEP]"]:
+            if abs(value) >= 0.05:
+                explanation.append({
+                    "token": token,
+                    "importance": round(float(value), 4)
+                })
 
     return explanation

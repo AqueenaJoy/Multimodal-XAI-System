@@ -112,12 +112,12 @@ function TryNow() {
 
   return (
     <div className="container">
-      <div className="hero" style={{ paddingBottom: "2rem" }}>
-        <h1>Unified Authenticity Scan</h1>
-        <p>Upload text and images for comprehensive  risk assessment</p>
+      <div className="hero fade-in-up" style={{ paddingBottom: "2rem" }}>
+        <h1><span className="gradient-text">Unified</span> Authenticity Scan</h1>
+        <p>Upload text and images for comprehensive risk assessment</p>
       </div>
 
-      <div className="two-column">
+      <div className="two-column fade-in-up" style={{ animationDelay: "0.2s" }}>
         <div className="input-panel">
           <div className="card">
             <h2>Input Modalities</h2>
@@ -166,7 +166,7 @@ function TryNow() {
                       </div>
                     ) : (
                       <div>
-                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📁</div>
+                        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}></div>
                         <div>Click to upload or drag & drop</div>
                         <div style={{ fontSize: "0.875rem", color: "#94a3b8" }}>
                           PNG, JPG up to 10MB
@@ -240,7 +240,7 @@ function TryNow() {
 
           {!loading && !result && (
             <div className="card" style={{ textAlign: "center", padding: "3rem" }}>
-              <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>🤖</div>
+              <div style={{ fontSize: "4rem", marginBottom: "1rem" }}></div>
               <h3>System Standby</h3>
               <p style={{ color: "#94a3b8" }}>Upload content and click "Analyze" to begin.</p>
             </div>

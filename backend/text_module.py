@@ -3,41 +3,30 @@ import os
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from emotion_module import detect_emotion
 
-
+# ================================
+# DEVICE SETUP
+# ================================
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ================================
-# LOAD FNN STYLE MODEL
+# LOAD ISOT MODEL
 # ================================
-# Reverting to the local custom-trained model as community HF models are severely overfitted
-FNN_PATH = os.path.join(BASE_DIR, "models", "text_model_fnn")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "text_model_isot")
 
-fnn_tokenizer = AutoTokenizer.from_pretrained(FNN_PATH)
-fnn_model = AutoModelForSequenceClassification.from_pretrained(FNN_PATH)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
 
-fnn_model.to(device)
-fnn_model.eval()
-
-# ================================
-# LOAD LIAR CLAIM MODEL
-# ================================
-LIAR_PATH = os.path.join(BASE_DIR, "models", "liar_binary_model")
-
-liar_tokenizer = AutoTokenizer.from_pretrained(LIAR_PATH)
-liar_model = AutoModelForSequenceClassification.from_pretrained(LIAR_PATH)
-
-liar_model.to(device)
-liar_model.eval()
+model.to(device)
+model.eval()
 
 
 # ================================
-# STYLE PREDICTION (FNN)
+# BASE TEXT PREDICTION
 # ================================
-def predict_style(text):
-
-    inputs = fnn_tokenizer(
+def predict_text(text):
+    inputs = tokenizer(
         text,
         truncation=True,
         padding=True,
@@ -46,56 +35,73 @@ def predict_style(text):
     ).to(device)
 
     with torch.no_grad():
-        outputs = fnn_model(**inputs)
+        outputs = model(**inputs)
         probs = torch.softmax(outputs.logits, dim=1)
 
+    # LABEL_1 = FAKE
     fake_prob = probs[0][1].item()
     return fake_prob
 
 
 # ================================
-# CLAIM PREDICTION (LIAR)
+# MANIPULATION DETECTOR
 # ================================
-def predict_claim(text):
+def detect_manipulation(text):
+    score = 0
 
-    inputs = liar_tokenizer(
-        text,
-        truncation=True,
-        padding=True,
-        max_length=128,
-        return_tensors="pt"
-    ).to(device)
+    # ALL CAPS
+    if text.isupper():
+        score += 0.3
 
-    with torch.no_grad():
-        outputs = liar_model(**inputs)
-        probs = torch.softmax(outputs.logits, dim=1)
+    # Excess punctuation
+    score += min(text.count("!") * 0.05, 0.3)
+    score += min(text.count("?") * 0.05, 0.3)
 
-    fake_prob = probs[0][0].item()
-    return fake_prob
+    # Clickbait keywords
+    clickbait_words = [
+        "shocking", "breaking", "urgent",
+        "unbelievable", "must watch", "exclusive"
+    ]
+
+    text_lower = text.lower()
+    for word in clickbait_words:
+        if word in text_lower:
+            score += 0.2
+
+    return min(score, 1.0)
 
 
 # ================================
-# COMBINED TEXT MODULE
+# FINAL TEXT MODULE
 # ================================
 def predict_text_module(text):
 
-    # Style-based fake probability
-    style_fake = predict_style(text)
+    # 1. Base model prediction
+    c_text = predict_text(text)
 
-    # Claim-based fake probability
-    claim_fake = predict_claim(text)
-
-    # Weighted combination (60% claim, 40% style)
-    combined_fake = (0.4 * style_fake) + (0.6 * claim_fake)
-
-    # Emotion detection
+    # 2. Emotion analysis
     emotion_data = detect_emotion(text)
+    e_risk = emotion_data["emotion_score"]
+
+    # 3. Manipulation detection
+    m_score = detect_manipulation(text)
+
+    # 4. Final score (YOUR SIGNATURE FORMULA)
+    final_score = (
+        0.75 * c_text +
+        0.15 * e_risk +
+        0.10 * m_score
+    )
+
+    # 5. Confidence
+    confidence = abs(0.5 - final_score) * 2
 
     return {
-        "style_fake_probability": round(style_fake, 4),
-        "claim_fake_probability": round(claim_fake, 4),
-        "fake_probability": round(combined_fake, 4),  # For fusion compatibility
+        "fake_probability": round(final_score, 4),
+        "base_model_score": round(c_text, 4),
         "emotion": emotion_data["emotion"],
-        "emotion_score": round(emotion_data["emotion_score"], 4),
+        "emotion_score": round(e_risk, 4),
+        "manipulation_score": round(m_score, 4),
+        "confidence": round(confidence, 4),
         "top_emotions": emotion_data.get("top_emotions", [])
     }

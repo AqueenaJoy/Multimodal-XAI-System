@@ -28,7 +28,7 @@ function ModalityIndicator({ text, image, video }) {
         ))}
       </div>
       {modalities.length > 1 && (
-        <div style={{marginTop: '0.5rem', fontSize: '0.75rem', color: '#3b82f6'}}>
+        <div style={{marginTop: '0.5rem', fontSize: '0.75rem', color: '#f59e0b'}}>
           🔄 Multimodal fusion will be applied
         </div>
       )}
